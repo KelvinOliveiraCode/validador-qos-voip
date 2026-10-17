@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "validador-qos-voip"
+version = "0.1.0"
+description = "Validador determinístico de QoS para VoIP: mede latência, jitter e perda por simulação (sem rede real) e emite pass/fail contra limiares."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Kelvin Oliveira"}]
+
+[project.scripts]
+validador-qos-voip = "validador_qos_voip.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
