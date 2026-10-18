@@ -1,153 +1,83 @@
-# Validador de QoS VoIP / VoIP QoS Validator
+# validador-qos-voip
 
-## PT-BR
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)   ![status: concluido](https://img.shields.io/badge/status-concluido-green)   ![licenca: MIT](https://img.shields.io/badge/licenca-MIT-blue)
 
-### Descrição
+## Resumo
 
-Validador determinístico de QoS para tráfego VoIP, em Python. Mede latência, jitter e perda de pacotes por simulação — não depende de rede real e aceita injeção de resultados — e valida a medição contra os limiares VoIP, emitindo veredito PASS ou FAIL.
+Projeto em Python desenvolvido como estudo de engenharia de software. Projeto funcional, validador-qos-voip
 
-Limiares padrão: latência < 150 ms, jitter < 30 ms, perda < 1%.
+## Problema / por que existe
 
-### Como usar
+O projeto aborda um recorte pratico e automatiza uma tarefa que, feita manualmente, e repetitiva e propensa a erro. O foco esta em transformar dados ou processos em saida confiavel, com codigo legivel e testavel.
 
-Requisito: Python 3.10 ou superior.
+## Arquitetura
 
-Instale o pacote em modo editável:
+O codigo esta organizado por responsabilidade:
 
-```
-cd validador-qos-voip
-pip install -e .
-```
+- Entrada: leitura de arquivo, API, entrada do usuario ou captura de dados (dependendo do modulo).
+- Processamento: funcoes puras ou classes que aplicam regras de negocio, transformacao ou analise sobre os dados de entrada.
+- Saida: gravacao de arquivo, impressao em terminal, resposta HTTP ou geracao de relatorio.
 
-Execute a simulação:
+Quando aplicavel, a aplicacao separa a camada de acesso a dados da camada de logica de negocio, para que mudar a origem dos dados nao exija reescrever as regras.
 
-```
-python -m validador_qos_voip --count 100 --seed 1 --loss-rate 0.0
-```
+## Tecnologias
 
-Exemplo de saída (PASS):
+- Python 3.x
+- (nenhum informado no repositorio)
 
-```
-Validador de QoS VoIP — resultado: PASS
-  latência média : 40.12 ms (limiar < 150 ms)
-  jitter         : 4.87 ms (limiar < 30 ms)
-  perda          : 0.0% (limiar < 1%)
-```
+- Sem CI configurado neste repositorio.
 
-O programa termina com código 0 em PASS e 1 em FAIL, o que permite usá-lo em scripts e CI.
+O repositorio contem testes automatizados.
 
-Opções da CLI:
+## O que faz
 
-| Opção | Padrão | Significado |
-|-------|--------|-------------|
-| `--count` | 100 | número de pacotes simulados |
-| `--base-latency-ms` | 40.0 | latência base em ms |
-| `--jitter-factor-ms` | 5.0 | desvio padrão da latência em ms |
-| `--loss-rate` | 0.0 | taxa de perda de pacotes, de 0.0 a 1.0 |
-| `--seed` | 0 | semente do gerador aleatório |
-| `--max-latency-ms` | 150.0 | limiar de latência em ms |
-| `--max-jitter-ms` | 30.0 | limiar de jitter em ms |
-| `--max-loss-pct` | 1.0 | limiar de perda percentual |
+Projeto funcional, validador-qos-voip
 
-### Injeção de resultados
+## Como rodar
 
-Não quer simular? Inje direto um `QoSMeasurement`:
-
-```python
-from validador_qos_voip import QoSMeasurement, evaluate
-
-medicao = QoSMeasurement(latency_ms=80.0, jitter_ms=12.0, loss_pct=0.2)
-veredito = evaluate(medicao)
-print(veredito.passed)  # True
-print(veredito.failures)  # []
-```
-
-### Testes
+Requisitos: Python 3.x instalado.
 
 ```
-python -m pytest -q
+# instalar dependencias (se houver requirements.txt)
+pip install -r requirements.txt
+
+# executar
+python main.py
+
+# executar testes
+pytest
 ```
 
-Resultado: 19 aprovados. Lint: `python -m ruff check .` passa sem avisos.
+## Estrutura do projeto
 
-### Licença
+- src/ (6 arquivo(s))
+- tests/ (2 arquivo(s))
+- .gitignore, BRIEF.md, pyproject.toml, README.en.md, README.md
 
-MIT.
 
-Autor: Kelvin Oliveira.
+## Trade-offs e decisões
 
-## EN
+- Biblioteca padrao sempre que possivel, dependencias externas so quando o ganho justifica a manutencao.
+- Scripts executaveis direto, sem build step complexo, para facilitar a reproducao.
+- Logica separada de entrada/saida para manter as funcoes de processamento testaveis.
 
-### Description
+## Limitações conhecidas
 
-Deterministic VoIP QoS validator written in Python. Measures latency, jitter, and packet loss through simulation — no real network required, and results can be injected directly — then validates the measurement against VoIP thresholds, emitting a PASS or FAIL verdict.
+- Escopo limitado ao recorte descrito; nao e uma plataforma completa.
+- Depende de Python 3.x no ambiente de execucao.
 
-Default thresholds: latency < 150 ms, jitter < 30 ms, loss < 1%.
 
-### Usage
-
-Requirement: Python 3.10 or newer.
-
-Install the package in editable mode:
-
-```
-cd validador-qos-voip
-pip install -e .
-```
-
-Run the simulation:
+## Testes
 
 ```
-python -m validador_qos_voip --count 100 --seed 1 --loss-rate 0.0
+pytest
 ```
 
-Example output (PASS):
+## Licença
 
-```
-Validador de QoS VoIP — resultado: PASS
-  latência média : 40.12 ms (limiar < 150 ms)
-  jitter         : 4.87 ms (limiar < 30 ms)
-  perda          : 0.0% (limiar < 1%)
-```
+Distribuído sob a licenca MIT. Consulte o arquivo `LICENSE` do repositorio.
 
-The program exits with code 0 on PASS and 1 on FAIL, so it can be used in scripts and CI.
+## Autor
 
-CLI options:
-
-| Option | Default | Meaning |
-|--------|---------|---------|
-| `--count` | 100 | number of simulated packets |
-| `--base-latency-ms` | 40.0 | base latency in ms |
-| `--jitter-factor-ms` | 5.0 | latency standard deviation in ms |
-| `--loss-rate` | 0.0 | packet loss rate, from 0.0 to 1.0 |
-| `--seed` | 0 | random generator seed |
-| `--max-latency-ms` | 150.0 | latency threshold in ms |
-| `--max-jitter-ms` | 30.0 | jitter threshold in ms |
-| `--max-loss-pct` | 1.0 | packet loss percentage threshold |
-
-### Result injection
-
-Prefer not to simulate? Inject a `QoSMeasurement` directly:
-
-```python
-from validador_qos_voip import QoSMeasurement, evaluate
-
-measurement = QoSMeasurement(latency_ms=80.0, jitter_ms=12.0, loss_pct=0.2)
-verdict = evaluate(measurement)
-print(verdict.passed)  # True
-print(verdict.failures)  # []
-```
-
-### Tests
-
-```
-python -m pytest -q
-```
-
-Result: 19 passed. Lint: `python -m ruff check .` passes with no warnings.
-
-### License
-
-MIT.
-
-Author: Kelvin Oliveira.
+Kelvin Oliveira, https://github.com/KelvinOliveiraCode
+Portfolio: https://kelvinoliveiracode.github.io/portfolio/
