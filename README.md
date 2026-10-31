@@ -1,118 +1,102 @@
 # validador-qos-voip
 
-<div align="center">
-
 [English](README.en.md) · **Português (Brasil)**
 
-</div>
-
-[![Python 3](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/) [![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikit-learn)](https://scikit-learn.org/) [![pandas](https://img.shields.io/badge/pandas-150458?style=flat-square&logo=pandas)](https://pandas.pydata.org/) [![pytest](https://img.shields.io/badge/pytest-0A9EDC?style=flat-square&logo=pytest)](https://docs.pytest.org/) [![MIT License](https://img.shields.io/badge/License-MIT-f4c430?style=flat-square)](LICENSE)
-
-### Projeto funcional ,  validador-qos-voip
-
----
+[![Python 3](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](#) [![pytest](https://img.shields.io/badge/pytest-19%20testes-0A9EDC?style=flat-square&logo=pytest)](#) [![MIT License](https://img.shields.io/badge/License-MIT-f4c430?style=flat-square)](LICENSE)
 
 ## O que é
 
-Projeto funcional ,  validador-qos-voip
+Validador de **Qualidade de Serviço (QoS) para VoIP** por **simulação determinística** (sem rede real): mede latência, jitter e perda de pacotes e compara com limiares configuráveis, devolvendo um veredito (aprovado/reprovado). É um laboratório educacional em Python puro, sem dependências.
 
----
+## Status
 
-## Início Rápido
+Laboratório educacional, funcional, com 19 testes.
 
-```bash
-# Clone e entre
-git clone https://github.com/KelvinOliveiraCode/<repo>.git
-cd <repo>
+> **Aviso (verificado pelo agente):** o repositório contém **estrutura duplicada commitada** (`src/src/…` e `tests/tests/…`). Por isso `pytest tests/` fallha com "import file mismatch" (exit 2). Os **19 testes passam** ao rodar `pytest tests/test_qos.py` diretamente. Ver `HYGIENE.md`.
 
-# Instale dependências
-# Nenhum requirements.txt detectado
+## Funcionalidades
 
-# Execute o projeto
-python main.py
+- **Simulador de ping determinístico** (`PingSimulator`): mesmos parâmetros → mesmo resultado; latência base, fator de jitter, taxa de perda e semente.
+- **Limiares de QoS configuráveis** (`QoSThresholds`): latência, jitter e perda máximos.
+- **Avaliação** (`evaluate`): compara a medição com os limiares e emite veredito.
+- **CLI**: `validador-qos-voip` com flags de contagem, latência, jitter, perda, semente e limiares.
 
-# Execute os testes
-pytest
+## Arquitetura
+
+Um pacote `validador_qos_voip` com `qos.py` (domínio: simulação, medição, limiares, veredito) e `__main__.py` (CLI). Sem backend, sem dependências externas.
+
+```mermaid
+flowchart LR
+    CLI[__main__.py - CLI] --> SIM[PingSimulator - simulação determinística]
+    CLI --> TH[QoSThresholds - limiares]
+    SIM --> M[QoSMeasurement]
+    M --> E[evaluate - veredito]
+    TH --> E
 ```
 
-## Como funciona
+## Stack
 
-Estrutura limpa e modular com separação de responsabilidades.
+- Python ≥ 3.10, stdlib apenas
+- pytest (dev)
 
----
+## Estrutura do repositório
 
-## Capacidades
+```
+validador-qos-voip/
+├── pyproject.toml
+├── BRIEF.md
+├── src/validador_qos_voip/
+│   ├── __init__.py · __main__.py · qos.py
+├── tests/test_qos.py
+├── (duplicados commitados: src/src/…, tests/tests/…)  # ver HYGIENE
+└── LICENSE              # MIT
+```
 
-| Capacidade | Descrição |
-|------------|-------------|
-| Carregamento de Dados | Auto-download do TensorFlow creditcard.csv (284k transações) com cache local |
-| EDA e Visualização | Distribuição de classes, histogramas de Amount, heatmaps de correlação (matplotlib/seaborn) |
-| Pré-processamento | RobustScaler em Amount/Time, split estratificado, remoção de duplicatas |
-| Balanceamento | SMOTE oversampling (fallback: class_weight="balanced") |
-| Modelagem | LogisticRegression, RandomForest, ExtraTrees com RandomizedSearchCV (StratifiedKFold) |
-| Métricas | Accuracy, Precision, Recall, F1, ROC AUC, Specificity, Confusion Matrix |
-| Seleção | Score ponderado: Recall 40% + F1 30% + Precision 20% + Accuracy 10% |
-| Persistência | Serialização joblib para modelo, scaler e resultados completos |
+## Pré-requisitos e instalação
 
+Python ≥ 3.10.
 
----
+```bash
+pip install -e .
+```
 
+## Como executar
 
+```bash
+# por módulo
+python -m validador_qos_voip --count 100 --base-latency-ms 40 --jitter-factor-ms 5 --loss-rate 0.02
 
----
+# via script instalado
+validador-qos-voip --seed 1
+```
 
-## Perguntas Frequentes
+## Testes e qualidade
 
-<details>
-<summary><strong>O que é este projeto?</strong></summary>
+Execução real (verificada pelo agente):
 
-Um estudo/projeto em Python demonstrando conceitos fundamentais.
+```bash
+python -m pytest tests/test_qos.py -q
+# 19 passed
+```
 
-</details>
+> `pytest tests/` (testpaths padrão) falha por causa da estrutura duplicada commitada — ver Status acima.
 
-<details>
-<summary><strong>Como executar?</strong></summary>
+## Decisões técnicas e trade-offs
 
-Veja [Início Rápido](#início-rápido) para comandos copiáveis.
+- **Simulação determinística em vez de rede real**: reprodutível, segura e offline; o custo é não medir a rede de verdade.
+- **Python puro sem dependências**: laboratório leve e fácil de rodar em qualquer máquina.
 
-</details>
+## Limitações conhecidas e roadmap
 
-<details>
-<summary><strong>Há testes?</strong></summary>
+- Simula, não testa rede real (MQoS aproximado por latência/jitter/perda).
+- A estrutura de pastas duplicada precisa ser limpa para o `pytest tests/` funcionar como esperado (proposta em `HYGIENE.md`).
 
-Nenhum teste automatizado neste repositório.
+## Processo de desenvolvimento
 
-</details>
+Projeto individual de Kelvin Oliveira, construído com agentes de IA orquestrados e revisado pelo autor. A lógica de simulação e avaliação de QoS e a revisão são do autor.
 
-<details>
-<summary><strong>Posso usar em produção?</strong></summary>
+## Licença e autor
 
-Este é um **projeto de estudo/portfólio**. Revise e endureça (auth, persistência, monitoramento, etc.) antes de usar em produção.
+MIT — Copyright (c) 2026 Kelvin Rebelo de Oliveira.
 
-</details>
-
-
-
----
-
-## Documentação
-
-- **Código-Fonte** ,  Navegue pelo diretório `src/` para detalhes de implementação
-- **Referência da API** ,  Docstrings inline + type hints
-- **Diagrama de Arquitetura** ,  Veja [architecture.mermaid](docs/architecture.mermaid) (se presente)
-- **Changelog** ,  [CHANGELOG.md](CHANGELOG.md) (se presente)
-- **Contribuindo** ,  [CONTRIBUTING.md](CONTRIBUTING.md) (se presente)
-
-## Licença
-
-[MIT](LICENSE) ,  Kelvin Oliveira
-
----
-
-<div align="center">
-
-**Construído com** · Python 3 + scikit-learn + pandas
-
-**Autor** · [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfolio](https://kelvinoliveiracode.github.io/portfolio/)
-
-</div>
+**Autor**: [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfólio](https://kelvinoliveiracode.github.io/portfolio/)
